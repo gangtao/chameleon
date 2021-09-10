@@ -1,5 +1,12 @@
 package generator
 
+import (
+	"chameleon/sink"
+	"chameleon/source"
+
+	uuid "github.com/satori/go.uuid"
+)
+
 type StatusType string
 
 const (
@@ -9,35 +16,28 @@ const (
 	STATUS_FAILED  StatusType = "failed"
 )
 
-type SinkType string
-
-const (
-	SINK_KAFKA StatusType = "kafka"
-)
-
-type GeneratorSink struct {
-	Name   string                 `json:"name"`
-	Type   SinkType               `json:"type"`
-	Config map[string]interface{} `json:"config"`
-}
-
-type KafkaSink struct {
-	Brokers []string `json:"brokers"`
-	Topic   string   `json:"topic"`
-}
-
-type GeneratorSource struct {
-	Name string `json:"name"`
-}
-
 type GeneratorConfig struct {
-	Name   string          `json:"name"`
-	Sink   GeneratorSink   `json:"sink"`
-	Source GeneratorSource `json:"source"`
+	Name   string                 `json:"name"`
+	Sink   sink.GeneratorSink     `json:"sink"`
+	Source source.GeneratorSource `json:"source"`
 }
 
 type Generator struct {
-	Name   string
+	Id     string
 	Status StatusType
 	Config GeneratorConfig
+}
+
+func NewGenerator(config *GeneratorConfig) *Generator {
+	generator := Generator{
+		Id:     uuid.NewV4().String(),
+		Status: STATUS_INIT,
+		Config: *config,
+	}
+
+	return &generator
+}
+
+func (g *Generator) Run() error {
+	return nil
 }
