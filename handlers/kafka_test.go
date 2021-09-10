@@ -8,6 +8,7 @@ import (
 	kafka "github.com/segmentio/kafka-go"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Test", func() {
@@ -60,12 +61,34 @@ var _ = Describe("Test", func() {
 				},
 			)
 
-			if err != nil {
-				log.Fatal("failed to write messages:", err)
-			}
+			Expect(err).ShouldNot(HaveOccurred())
 
 			if err := w.Close(); err != nil {
 				log.Fatal("failed to close writer:", err)
+			}
+
+		})
+
+		It("read some message", func() {
+			r := kafka.NewReader(kafka.ReaderConfig{
+				Brokers:   []string{"localhost:9092", "localhost:9093", "localhost:9094"},
+				Topic:     "topic-A",
+				Partition: 0,
+				MinBytes:  10e3, // 10KB
+				MaxBytes:  10e6, // 10MB
+			})
+			r.SetOffset(0)
+
+			for i := 0; i < 10; i++ {
+				m, err := r.ReadMessage(context.Background())
+				if err != nil {
+					break
+				}
+				log.Printf("message at offset %d: %s = %s\n", m.Offset, string(m.Key), string(m.Value))
+			}
+
+			if err := r.Close(); err != nil {
+				log.Fatal("failed to close reader:", err)
 			}
 
 		})

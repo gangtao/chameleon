@@ -29,7 +29,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "root"
+                    "health check"
                 ],
                 "summary": "Show the status of server.",
                 "responses": {
@@ -40,6 +40,191 @@
                             "additionalProperties": true
                         }
                     }
+                }
+            }
+        },
+        "/generators": {
+            "get": {
+                "description": "list all generators.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "generator"
+                ],
+                "summary": "list all generators.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create a generator.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "generator"
+                ],
+                "summary": "Create a generator.",
+                "parameters": [
+                    {
+                        "description": "generator configuration",
+                        "name": "config",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GeneratorConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GeneratorConfig"
+                        }
+                    }
+                }
+            }
+        },
+        "/generators/{name}": {
+            "get": {
+                "description": "get generator by name.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "generator"
+                ],
+                "summary": "get generator by name.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "configuration name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GeneratorConfig"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete generator by name.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "generator"
+                ],
+                "summary": "delete generator by name.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "configuration name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/generators/{name}/start": {
+            "post": {
+                "description": "start to run a generator.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "generator"
+                ],
+                "summary": "start to run a generator.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "configuration name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/generators/{name}/stop": {
+            "post": {
+                "description": "stop a running generator.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "generator"
+                ],
+                "summary": "stop a running generator.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "configuration name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.GeneratorConfig": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
                 }
             }
         }

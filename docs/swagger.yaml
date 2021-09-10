@@ -1,4 +1,10 @@
 basePath: /
+definitions:
+  handlers.GeneratorConfig:
+    properties:
+      name:
+        type: string
+    type: object
 host: localhost:3000
 info:
   contact:
@@ -26,7 +32,122 @@ paths:
             type: object
       summary: Show the status of server.
       tags:
-      - root
+      - health check
+  /generators:
+    get:
+      consumes:
+      - application/json
+      description: list all generators.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: list all generators.
+      tags:
+      - generator
+    post:
+      consumes:
+      - application/json
+      description: create a generator.
+      parameters:
+      - description: generator configuration
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.GeneratorConfig'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.GeneratorConfig'
+      summary: Create a generator.
+      tags:
+      - generator
+  /generators/{name}:
+    delete:
+      consumes:
+      - application/json
+      description: delete generator by name.
+      parameters:
+      - description: configuration name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+      summary: delete generator by name.
+      tags:
+      - generator
+    get:
+      consumes:
+      - application/json
+      description: get generator by name.
+      parameters:
+      - description: configuration name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.GeneratorConfig'
+      summary: get generator by name.
+      tags:
+      - generator
+  /generators/{name}/start:
+    post:
+      consumes:
+      - application/json
+      description: start to run a generator.
+      parameters:
+      - description: configuration name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+      summary: start to run a generator.
+      tags:
+      - generator
+  /generators/{name}/stop:
+    post:
+      consumes:
+      - application/json
+      description: stop a running generator.
+      parameters:
+      - description: configuration name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+      summary: stop a running generator.
+      tags:
+      - generator
 schemes:
 - http
 swagger: "2.0"
