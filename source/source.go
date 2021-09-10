@@ -1,5 +1,9 @@
 package source
 
+import (
+	"log"
+)
+
 type SourceFieldType string
 
 const (
@@ -16,10 +20,52 @@ type SourceField struct {
 	Limit []interface{}   `json:"limit,omitempty"`
 }
 
-type GeneratorSource struct {
+type SourceConfiguration struct {
 	Name           string        `json:"name"`
 	TimestampField string        `json:"timestamp_field"`
 	BatchSize      int           `json:"batch_size"`
+	Concurrency    int           `json:"concurrency"`
 	Internval      []int         `json:"interval"`
 	Fields         []SourceField `json:"fields"`
+}
+
+type Event struct {
+	Key   string                 `json:"key"`
+	Value map[string]interface{} `json:"value"`
+}
+
+type EventGenerator struct {
+	Config       SourceConfiguration
+	EventChannel chan Event
+}
+
+func NewEventGenerator(source *SourceConfiguration) *EventGenerator {
+	eventChan := make(chan Event, 100)
+	generator := EventGenerator{
+		Config:       *source,
+		EventChannel: eventChan,
+	}
+
+	return &generator
+}
+
+func (s *EventGenerator) run() {
+	event := Event{
+		Key:   "somekey",
+		Value: map[string]interface{}{},
+	}
+	s.EventChannel <- event
+}
+
+func (s *EventGenerator) Stop() {
+	close(s.EventChannel)
+}
+
+func (s *EventGenerator) Run() {
+	config := s.Config
+	log.Printf("start to run event generator : %s \n", config.Name)
+
+	for i := 0; i < config.Concurrency; i++ {
+		go s.run()
+	}
 }

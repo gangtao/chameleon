@@ -34,7 +34,7 @@ var _ = Describe("Generator", func() {
 				Type:   "kafka",
 				Config: in,
 			},
-			Source: source.GeneratorSource{
+			Source: source.SourceConfiguration{
 				Name:           "sourcename",
 				TimestampField: "f1",
 				BatchSize:      100,

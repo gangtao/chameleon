@@ -17,9 +17,9 @@ const (
 )
 
 type GeneratorConfig struct {
-	Name   string                 `json:"name"`
-	Sink   sink.GeneratorSink     `json:"sink"`
-	Source source.GeneratorSource `json:"source"`
+	Name   string                     `json:"name"`
+	Sink   sink.GeneratorSink         `json:"sink"`
+	Source source.SourceConfiguration `json:"source"`
 }
 
 type Generator struct {

@@ -1,4 +1,4 @@
-package sink
+package sink_test
 
 import (
 	"context"
