@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  kafkaui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "9001:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=host.docker.internal:9092,host.docker.internal:9093,host.docker.internal:9094
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
