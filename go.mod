@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/gin-gonic/gin v1.7.4
+	github.com/mitchellh/mapstructure v1.4.1
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.10.1
 	github.com/segmentio/kafka-go v0.4.18

@@ -98,7 +98,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.GeneratorConfig"
+                            "$ref": "#/definitions/generator.GeneratorConfig"
                         }
                     }
                 ],
@@ -106,7 +106,7 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/handlers.GeneratorConfig"
+                            "$ref": "#/definitions/generator.GeneratorConfig"
                         }
                     }
                 }
@@ -138,7 +138,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlers.GeneratorConfig"
+                            "$ref": "#/definitions/generator.GeneratorConfig"
                         }
                     }
                 }
@@ -231,7 +231,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "handlers.GeneratorConfig": {
+        "generator.GeneratorConfig": {
             "type": "object",
             "properties": {
                 "name": {

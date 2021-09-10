@@ -87,7 +87,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.GeneratorConfig"
+                            "$ref": "#/definitions/generator.GeneratorConfig"
                         }
                     }
                 ],
@@ -95,7 +95,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/handlers.GeneratorConfig"
+                            "$ref": "#/definitions/generator.GeneratorConfig"
                         }
                     }
                 }
@@ -127,7 +127,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handlers.GeneratorConfig"
+                            "$ref": "#/definitions/generator.GeneratorConfig"
                         }
                     }
                 }
@@ -220,7 +220,7 @@
         }
     },
     "definitions": {
-        "handlers.GeneratorConfig": {
+        "generator.GeneratorConfig": {
             "type": "object",
             "properties": {
                 "name": {

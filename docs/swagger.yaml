@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  handlers.GeneratorConfig:
+  generator.GeneratorConfig:
     properties:
       name:
         type: string
@@ -60,14 +60,14 @@ paths:
         name: config
         required: true
         schema:
-          $ref: '#/definitions/handlers.GeneratorConfig'
+          $ref: '#/definitions/generator.GeneratorConfig'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/handlers.GeneratorConfig'
+            $ref: '#/definitions/generator.GeneratorConfig'
       summary: Create a generator.
       tags:
       - generator
@@ -106,7 +106,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handlers.GeneratorConfig'
+            $ref: '#/definitions/generator.GeneratorConfig'
       summary: get generator by name.
       tags:
       - generator

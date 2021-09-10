@@ -4,12 +4,10 @@ import (
 	"log"
 	"net/http"
 
+	"chameleon/generator"
+
 	"github.com/gin-gonic/gin"
 )
-
-type GeneratorConfig struct {
-	Name string `json:"name"`
-}
 
 // CreateGenerator godoc
 // @Summary Create a generator.
@@ -17,11 +15,11 @@ type GeneratorConfig struct {
 // @Tags generator
 // @Accept json
 // @Produce json
-// @Param config body GeneratorConfig true "generator configuration"
-// @Success 201 {object} GeneratorConfig
+// @Param config body generator.GeneratorConfig true "generator configuration"
+// @Success 201 {object} generator.GeneratorConfig
 // @Router /generators [post]
 func CreateGenerator(c *gin.Context) {
-	json := GeneratorConfig{}
+	json := generator.GeneratorConfig{}
 	c.BindJSON(&json)
 
 	log.Printf("%v", &json)
@@ -50,13 +48,13 @@ func ListGenerator(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param name path string true "configuration name"
-// @Success 200 {object} GeneratorConfig
+// @Success 200 {object} generator.GeneratorConfig
 // @Router /generators/{name} [get]
 func GetGenerator(c *gin.Context) {
 	name := c.Param("name")
 	log.Printf("%s", name)
 
-	res := GeneratorConfig{Name: name}
+	res := generator.GeneratorConfig{Name: name}
 	c.JSON(http.StatusOK, res)
 }
 
