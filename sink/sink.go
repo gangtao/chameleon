@@ -14,6 +14,7 @@ type SinkConfiguration struct {
 
 type Writer interface {
 	Write(events *[]*source.Event) error
+	Count() int
 }
 
 func WriteEvents(writer *Writer, events *[]*source.Event) error {

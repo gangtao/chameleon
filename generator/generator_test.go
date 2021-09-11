@@ -270,7 +270,7 @@ var _ = Describe("Generator", func() {
 		g := generator.NewGenerator(&res)
 		Expect(g).ShouldNot(BeNil())
 		log.Printf("%v", g)
-		g.Run(1000 * 1000)
+		g.Run(1000 * 100)
 	})
 
 })

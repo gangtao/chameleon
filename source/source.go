@@ -42,6 +42,7 @@ type EventGenerator struct {
 	Config       SourceConfiguration
 	EventChannel chan []*Event
 	Stopped      bool
+	Counter      int
 	mu           sync.Mutex
 }
 
@@ -51,6 +52,7 @@ func NewEventGenerator(source *SourceConfiguration) *EventGenerator {
 		Config:       *source,
 		EventChannel: eventChan,
 		Stopped:      false,
+		Counter:      0,
 	}
 
 	return &generator
@@ -191,6 +193,7 @@ func (s *EventGenerator) run() {
 		s.mu.Lock()
 		if !s.Stopped {
 			s.EventChannel <- events
+			s.Counter += len(events)
 		}
 		s.mu.Unlock()
 
@@ -200,7 +203,6 @@ func (s *EventGenerator) run() {
 		} else {
 			time.Sleep(time.Microsecond * interval)
 		}
-
 	}
 }
 

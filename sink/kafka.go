@@ -23,6 +23,7 @@ type KafkaSink struct {
 	SinkConfiguration
 	KafkaConfig KafkaSinkConfiguration
 	Writer      *kafka.Writer
+	Counter     int
 }
 
 func NewKafkaSink(config *SinkConfiguration) *KafkaSink {
@@ -44,6 +45,7 @@ func NewKafkaSink(config *SinkConfiguration) *KafkaSink {
 		},
 		KafkaConfig: kafkaConfig,
 		Writer:      writer,
+		Counter:     0,
 	}
 
 	return &result
@@ -66,7 +68,14 @@ func (s *KafkaSink) Write(events *[]*source.Event) error {
 
 	if err != nil {
 		log.Fatal("failed to write messages:", err)
+	} else {
+		s.Counter += len(*events)
+		log.Println("send data to sink kafka")
 	}
 
 	return err
+}
+
+func (s *KafkaSink) Count() int {
+	return s.Counter
 }
