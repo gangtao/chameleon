@@ -33,6 +33,7 @@ type Generator struct {
 }
 
 func NewGenerator(config *GeneratorConfig) *Generator {
+	//TODO: support other sink type as well
 	kafkaSink := sink.NewKafkaSink(&config.Sink)
 	generator := Generator{
 		Id:     uuid.NewV4().String(),
@@ -45,14 +46,18 @@ func NewGenerator(config *GeneratorConfig) *Generator {
 	return &generator
 }
 
-func (g *Generator) Run() error {
+func (g *Generator) Run(timeout time.Duration) error {
+	g.Status = STATUS_RUNNING
 	g.Source.Run()
 
 	// Test to run for a while
-	go func() {
-		time.Sleep(time.Millisecond * 300)
-		g.Source.Stop()
-	}()
+	if timeout != 0 {
+		go func() {
+			time.Sleep(time.Microsecond * timeout)
+			g.Source.Stop()
+			g.Status = STATUS_STOPPED
+		}()
+	}
 
 	for {
 		events, ok := <-g.Source.EventChannel
@@ -60,12 +65,12 @@ func (g *Generator) Run() error {
 		if !ok {
 			break
 		}
-		//TODO: cache events to send
-		g.Sink.Write(&events)
-		// go func() {
-		// 	g.Sink.Write(&events)
-		// }()
-		time.Sleep(time.Millisecond * 1)
+
+		// send data in coroutine, do not block the channel
+		go func() {
+			g.Sink.Write(&events)
+		}()
+		//time.Sleep(time.Millisecond * 1)
 	}
 
 	return nil

@@ -220,10 +220,9 @@ var _ = Describe("Generator", func() {
 			   "name":"sourcename",
 			   "timestamp_field":"f1",
 			   "batch_size":2,
-			   "concurrency":30,
-			   "interval":[1],
+			   "concurrency":1,
 			   "interval":[
-				  0,
+				  10,
 				  100
 			   ],
 			   "fields":[
@@ -271,7 +270,7 @@ var _ = Describe("Generator", func() {
 		g := generator.NewGenerator(&res)
 		Expect(g).ShouldNot(BeNil())
 		log.Printf("%v", g)
-		g.Run()
+		g.Run(1000 * 1000)
 	})
 
 })

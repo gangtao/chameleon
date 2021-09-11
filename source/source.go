@@ -171,6 +171,22 @@ func (s *EventGenerator) generateBatchEvent() []*Event {
 }
 
 func (s *EventGenerator) run() {
+
+	intervalRange := s.Config.Internval
+	log.Printf("Interval configuration is %v", intervalRange)
+
+	interval := time.Duration(1)
+
+	if len(intervalRange) == 1 {
+		interval = time.Duration(intervalRange[0])
+
+		log.Printf("Using configured interval %v", interval)
+	} else if len(intervalRange) == 2 {
+		interval = time.Duration(intervalRange[0])
+
+		log.Printf("Using configured interval %v", interval)
+	}
+
 	for {
 		if s.Stopped {
 			break
@@ -184,7 +200,7 @@ func (s *EventGenerator) run() {
 		s.mu.Unlock()
 
 		// TODO: use interval in configuration
-		time.Sleep(time.Millisecond * 1)
+		time.Sleep(time.Microsecond * interval)
 	}
 }
 

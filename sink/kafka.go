@@ -22,12 +22,19 @@ type KafkaSinkConfiguration struct {
 type KafkaSink struct {
 	SinkConfiguration
 	KafkaConfig KafkaSinkConfiguration
+	Writer      *kafka.Writer
 }
 
 func NewKafkaSink(config *SinkConfiguration) *KafkaSink {
 
 	var kafkaConfig KafkaSinkConfiguration
 	mapstructure.Decode(config.Config, &kafkaConfig)
+
+	writer := kafka.NewWriter(kafka.WriterConfig{
+		Brokers:  kafkaConfig.Brokers,
+		Topic:    kafkaConfig.Topic,
+		Balancer: &kafka.Hash{},
+	})
 
 	result := KafkaSink{
 		SinkConfiguration: SinkConfiguration{
@@ -36,18 +43,13 @@ func NewKafkaSink(config *SinkConfiguration) *KafkaSink {
 			Config: config.Config,
 		},
 		KafkaConfig: kafkaConfig,
+		Writer:      writer,
 	}
 
 	return &result
 }
 
 func (s *KafkaSink) Write(events *[]*source.Event) error {
-	w := kafka.NewWriter(kafka.WriterConfig{
-		Brokers:  s.KafkaConfig.Brokers,
-		Topic:    s.KafkaConfig.Topic,
-		Balancer: &kafka.Hash{},
-	})
-
 	messages := make([]kafka.Message, len(*events))
 
 	for i := 0; i < len(*events); i++ {
@@ -60,9 +62,7 @@ func (s *KafkaSink) Write(events *[]*source.Event) error {
 		}
 	}
 
-	log.Println("write events in kafka")
-
-	err := w.WriteMessages(context.Background(), messages...)
+	err := s.Writer.WriteMessages(context.Background(), messages...)
 
 	if err != nil {
 		log.Fatal("failed to write messages:", err)
