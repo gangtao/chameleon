@@ -7,6 +7,9 @@ import (
 
 	kafka "github.com/segmentio/kafka-go"
 
+	"chameleon/sink"
+	"chameleon/source"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -15,7 +18,7 @@ var _ = Describe("Test", func() {
 
 	Describe("Kafka Producer", func() {
 
-		It("Test connection", func() {
+		XIt("Test connection", func() {
 			topic := "topic-A"
 			partition := 0
 
@@ -39,7 +42,7 @@ var _ = Describe("Test", func() {
 			}
 		})
 
-		It("produce some message", func() {
+		XIt("produce some message", func() {
 			w := kafka.NewWriter(kafka.WriterConfig{
 				Brokers:  []string{"localhost:9092"},
 				Topic:    "topic-A",
@@ -69,7 +72,7 @@ var _ = Describe("Test", func() {
 
 		})
 
-		It("read some message", func() {
+		XIt("read some message", func() {
 			r := kafka.NewReader(kafka.ReaderConfig{
 				Brokers:   []string{"localhost:9092", "localhost:9093", "localhost:9094"},
 				Topic:     "topic-A",
@@ -90,6 +93,39 @@ var _ = Describe("Test", func() {
 			if err := r.Close(); err != nil {
 				log.Fatal("failed to close reader:", err)
 			}
+
+		})
+
+		It("write some message using kafka sink", func() {
+			config := sink.SinkConfiguration{
+				Name: "kafka",
+				Type: sink.SINK_KAFKA,
+				Config: map[string]interface{}{
+					"Brokers": []string{"localhost:9092", "localhost:9093", "localhost:9094"},
+					"Topic":   "topic-A",
+				},
+			}
+
+			sink := sink.NewKafkaSink(&config)
+			event1 := source.Event{
+				Key: "somekey1",
+				Value: map[string]interface{}{
+					"key1": "value1",
+					"key2": "value2",
+				},
+			}
+
+			event2 := source.Event{
+				Key: "somekey2",
+				Value: map[string]interface{}{
+					"key3": "value3",
+					"key4": "value4",
+				},
+			}
+			events := []*source.Event{&event1, &event2}
+
+			err := sink.Write(&events)
+			Expect(err).ShouldNot(HaveOccurred())
 
 		})
 	})

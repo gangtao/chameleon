@@ -14,7 +14,7 @@ const (
 	FIELDTYPE_TIMESTAMP SourceFieldType = "timestamp"
 	FIELDTYPE_STRING    SourceFieldType = "string"
 	FIELDTYPE_INT       SourceFieldType = "int"
-	FIELDTYPE_FLOAT32   SourceFieldType = "float"
+	FIELDTYPE_FLOAT     SourceFieldType = "float"
 )
 
 type SourceField struct {
@@ -40,13 +40,13 @@ type Event struct {
 
 type EventGenerator struct {
 	Config       SourceConfiguration
-	EventChannel chan Event
+	EventChannel chan []*Event
 	Stopped      bool
 	mu           sync.Mutex
 }
 
 func NewEventGenerator(source *SourceConfiguration) *EventGenerator {
-	eventChan := make(chan Event, 100)
+	eventChan := make(chan []*Event, 100)
 	generator := EventGenerator{
 		Config:       *source,
 		EventChannel: eventChan,
@@ -118,23 +118,23 @@ func makeValue(sourceType *SourceFieldType, sourceRange *[]interface{}, sourceLi
 	case FIELDTYPE_INT:
 		ranges := make([]int, len(*sourceRange))
 		for i := 0; i < len(*sourceRange); i++ {
-			ranges[i] = (*sourceRange)[i].(int)
+			ranges[i] = int((*sourceRange)[i].(float64))
 		}
 
 		limits := make([]int, len(*sourceLimit))
 		for i := 0; i < len(*sourceLimit); i++ {
-			limits[i] = (*sourceLimit)[i].(int)
+			limits[i] = int((*sourceLimit)[i].(float64))
 		}
 		return makeInt(&ranges, &limits)
-	case FIELDTYPE_FLOAT32:
+	case FIELDTYPE_FLOAT:
 		ranges := make([]float32, len(*sourceRange))
 		for i := 0; i < len(*sourceRange); i++ {
-			ranges[i] = (*sourceRange)[i].(float32)
+			ranges[i] = float32((*sourceRange)[i].(float64))
 		}
 
 		limits := make([]float32, len(*sourceLimit))
 		for i := 0; i < len(*sourceLimit); i++ {
-			limits[i] = (*sourceLimit)[i].(float32)
+			limits[i] = float32((*sourceLimit)[i].(float64))
 		}
 		return makeFloat(&ranges, &limits)
 	default:
@@ -176,13 +176,12 @@ func (s *EventGenerator) run() {
 			break
 		}
 
-		for _, v := range s.generateBatchEvent() {
-			s.mu.Lock()
-			if !s.Stopped {
-				s.EventChannel <- *v
-			}
-			s.mu.Unlock()
+		events := s.generateBatchEvent()
+		s.mu.Lock()
+		if !s.Stopped {
+			s.EventChannel <- events
 		}
+		s.mu.Unlock()
 
 		// TODO: use interval in configuration
 		time.Sleep(time.Millisecond * 1)

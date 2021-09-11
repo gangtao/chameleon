@@ -1,9 +1,21 @@
 package sink
 
+import (
+	"chameleon/source"
+)
+
 type SinkType string
 
-type GeneratorSink struct {
+type SinkConfiguration struct {
 	Name   string                 `json:"name"`
 	Type   SinkType               `json:"type"`
 	Config map[string]interface{} `json:"config"`
+}
+
+type Writer interface {
+	Write(events *[]*source.Event) error
+}
+
+func WriteEvents(writer *Writer, events *[]*source.Event) error {
+	return (*writer).Write(events)
 }

@@ -31,12 +31,12 @@ var _ = Describe("Source", func() {
 				source.SourceField{
 					Name:  "f2",
 					Type:  source.FIELDTYPE_INT,
-					Range: []interface{}{0, 10, 100},
+					Range: []interface{}{float64(0), float64(10), float64(100)},
 				},
 				source.SourceField{
 					Name:  "f3",
-					Type:  source.FIELDTYPE_FLOAT32,
-					Limit: []interface{}{float32(0.1), float32(100.0)},
+					Type:  source.FIELDTYPE_FLOAT,
+					Limit: []interface{}{float64(0.1), float64(100.0)},
 				},
 			},
 		}
