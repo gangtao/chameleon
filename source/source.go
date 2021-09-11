@@ -171,20 +171,15 @@ func (s *EventGenerator) generateBatchEvent() []*Event {
 }
 
 func (s *EventGenerator) run() {
-
 	intervalRange := s.Config.Internval
-	log.Printf("Interval configuration is %v", intervalRange)
-
-	interval := time.Duration(1)
+	interval := time.Duration(1) // default to 1 micro second
+	useRandomInterval := false
+	faker := fake.New(0)
 
 	if len(intervalRange) == 1 {
 		interval = time.Duration(intervalRange[0])
-
-		log.Printf("Using configured interval %v", interval)
 	} else if len(intervalRange) == 2 {
-		interval = time.Duration(intervalRange[0])
-
-		log.Printf("Using configured interval %v", interval)
+		useRandomInterval = true
 	}
 
 	for {
@@ -199,8 +194,13 @@ func (s *EventGenerator) run() {
 		}
 		s.mu.Unlock()
 
-		// TODO: use interval in configuration
-		time.Sleep(time.Microsecond * interval)
+		if useRandomInterval {
+			rInterval := faker.Number(int(intervalRange[0]), int(intervalRange[1]))
+			time.Sleep(time.Microsecond * time.Duration(rInterval))
+		} else {
+			time.Sleep(time.Microsecond * interval)
+		}
+
 	}
 }
 
