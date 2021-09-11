@@ -10,3 +10,9 @@ run:
 
 gen:
 	$(HOME)/go/bin/swag init -g server/main.go 
+
+test:
+	go test ./generator/
+	go test ./source/
+	go test ./sink/
+	go test ./handlers/
