@@ -15,7 +15,7 @@ var _ = Describe("Source", func() {
 		config := source.SourceConfiguration{
 			Name:           "testConfig",
 			TimestampField: "t",
-			BatchSize:      100,
+			BatchSize:      2,
 			Concurrency:    3,
 			Internval:      []int{100},
 			Fields: []source.SourceField{
@@ -26,12 +26,17 @@ var _ = Describe("Source", func() {
 				source.SourceField{
 					Name:  "f1",
 					Type:  source.FIELDTYPE_STRING,
-					Range: []interface{}{"a", "b", "c"},
+					Range: []interface{}{"aa", "bb", "cc"},
 				},
 				source.SourceField{
 					Name:  "f2",
-					Type:  source.FIELDTYPE_INT32,
-					Limit: []interface{}{0, 100},
+					Type:  source.FIELDTYPE_INT,
+					Range: []interface{}{0, 10, 100},
+				},
+				source.SourceField{
+					Name:  "f3",
+					Type:  source.FIELDTYPE_FLOAT32,
+					Limit: []interface{}{float32(0.1), float32(100.0)},
 				},
 			},
 		}
@@ -42,19 +47,17 @@ var _ = Describe("Source", func() {
 		generator.Run()
 
 		go func() {
-			time.Sleep(time.Second * 1)
+			time.Sleep(time.Millisecond * 300)
 			generator.Stop()
 		}()
 
 		for {
 			event, ok := <-generator.EventChannel
 			log.Printf("%v, %v \n", event, ok)
-
 			if !ok {
 				break
 			}
-
-			time.Sleep(time.Second * 1)
+			time.Sleep(time.Millisecond * 1)
 		}
 	})
 
