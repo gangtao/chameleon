@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -12,6 +13,7 @@ import (
 
 const CONFIG_DIR = "config"
 
+//TODO : should store pointer to the generator instead of the object
 type GeneratorManager struct {
 	Manager map[string]Generator
 }
@@ -20,6 +22,12 @@ var lock = &sync.Mutex{}
 var (
 	instance *GeneratorManager
 )
+
+type GeneratorStatus struct {
+	Status      StatusType `json:"status"`
+	SourceCount int        `json:"source_count"`
+	SinkCount   int        `json:"sink_count"`
+}
 
 func NewGeneratorManager() *GeneratorManager {
 	lock.Lock()
@@ -88,10 +96,30 @@ func (gm *GeneratorManager) ListGenerator() []string {
 	return names
 }
 
-func (gm *GeneratorManager) DeleteGenerator(name string) {
-	delete(gm.Manager, name)
-	path := fmt.Sprintf("%s/%s.json", CONFIG_DIR, name)
-	// delete the file as well
-	os.Remove(path)
+func (gm *GeneratorManager) DeleteGenerator(name string) error {
+	_, exists := gm.Manager[name]
+	if exists {
+		delete(gm.Manager, name)
+		path := fmt.Sprintf("%s/%s.json", CONFIG_DIR, name)
+		// delete the file as well
+		os.Remove(path)
+		return nil
+	}
 
+	return errors.New("Generator does not exist")
+}
+
+func (gm *GeneratorManager) GetGeneratorStatus(name string) (*GeneratorStatus, error) {
+	g, exists := gm.Manager[name]
+	log.Printf("Generator address %p ", &g)
+	if exists {
+		status := GeneratorStatus{
+			Status:      g.Status,
+			SourceCount: g.Source.Counter,
+			SinkCount:   g.Sink.Count(),
+		}
+		return &status, nil
+	}
+
+	return nil, errors.New("Generator does not exist")
 }

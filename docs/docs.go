@@ -108,6 +108,9 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/generator.GeneratorConfig"
                         }
+                    },
+                    "409": {
+                        "description": ""
                     }
                 }
             }
@@ -140,6 +143,9 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/generator.GeneratorConfig"
                         }
+                    },
+                    "409": {
+                        "description": ""
                     }
                 }
             },
@@ -166,6 +172,9 @@ var doc = `{
                 ],
                 "responses": {
                     "204": {
+                        "description": ""
+                    },
+                    "404": {
                         "description": ""
                     }
                 }
@@ -196,6 +205,44 @@ var doc = `{
                 "responses": {
                     "204": {
                         "description": ""
+                    },
+                    "404": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/generators/{name}/status": {
+            "post": {
+                "description": "get status of a generator.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "generator"
+                ],
+                "summary": "get status of a generator.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "configuration name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/generator.GeneratorStatus"
+                        }
+                    },
+                    "404": {
+                        "description": ""
                     }
                 }
             }
@@ -225,6 +272,9 @@ var doc = `{
                 "responses": {
                     "204": {
                         "description": ""
+                    },
+                    "404": {
+                        "description": ""
                     }
                 }
             }
@@ -242,6 +292,20 @@ var doc = `{
                 },
                 "source": {
                     "$ref": "#/definitions/source.SourceConfiguration"
+                }
+            }
+        },
+        "generator.GeneratorStatus": {
+            "type": "object",
+            "properties": {
+                "sink_count": {
+                    "type": "integer"
+                },
+                "source_count": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },

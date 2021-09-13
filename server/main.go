@@ -55,6 +55,7 @@ func main() {
 	r.GET("/generators/:name", handlers.GetGenerator)
 	r.POST("/generators/:name/start", handlers.StartGenerator)
 	r.POST("/generators/:name/stop", handlers.StopGenerator)
+	r.POST("/generators/:name/status", handlers.GeneratorStatus)
 
 	url := ginSwagger.URL("http://localhost:3000/swagger/doc.json") // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
