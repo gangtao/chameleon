@@ -208,8 +208,10 @@ func (s *EventGenerator) run() {
 
 func (s *EventGenerator) Stop() {
 	s.mu.Lock()
-	s.Stopped = true
-	close(s.EventChannel)
+	if !s.Stopped {
+		s.Stopped = true
+		close(s.EventChannel)
+	}
 	s.mu.Unlock()
 }
 

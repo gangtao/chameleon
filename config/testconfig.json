@@ -1,0 +1,58 @@
+{
+ "name": "testconfig",
+ "sink": {
+  "name": "sinkname",
+  "type": "kafka",
+  "config": {
+   "brokers": [
+    "kafka1:9092",
+    "kafka2:9093",
+    "kafka3:9094"
+   ],
+   "topic": "topic-A"
+  }
+ },
+ "source": {
+  "name": "sourcename",
+  "timestamp_field": "f1",
+  "batch_size": 2,
+  "concurrency": 2,
+  "interval": [
+   10000,
+   20000
+  ],
+  "fields": [
+   {
+    "name": "f1",
+    "type": "timestamp"
+   },
+   {
+    "name": "f2",
+    "type": "string",
+    "range": [
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   {
+    "name": "f3",
+    "type": "int",
+    "range": [
+     1,
+     5,
+     30
+    ]
+   },
+   {
+    "name": "f4",
+    "type": "float",
+    "range": [
+     1.2,
+     5.5,
+     30.2
+    ]
+   }
+  ]
+ }
+}
