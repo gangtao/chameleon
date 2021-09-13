@@ -98,20 +98,16 @@ func DeleteGenerator(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param name path string true "configuration name"
-// @Success 204
+// @Success 200
 // @Failure 404
 // @Router /generators/{name}/start [post]
 func StartGenerator(c *gin.Context) {
 	name := c.Param("name")
 	gm := c.MustGet("gm").(*generator.GeneratorManager)
-	g, exists := gm.Manager[name]
-	if exists {
-		// TODO : check generator status
-		// if generator stopped, should re-create a instance
-		go func() {
-			g.Run(1000 * 1000)
-		}()
-		c.Status(http.StatusNoContent)
+	err := gm.StartGenerator(name)
+
+	if err == nil {
+		c.Status(http.StatusOK)
 	} else {
 		c.Status(http.StatusNotFound)
 	}
@@ -124,18 +120,16 @@ func StartGenerator(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param name path string true "configuration name"
-// @Success 204
+// @Success 200
 // @Failure 404
 // @Router /generators/{name}/stop [post]
 func StopGenerator(c *gin.Context) {
 	name := c.Param("name")
 	gm := c.MustGet("gm").(*generator.GeneratorManager)
-	g, exists := gm.Manager[name]
-	if exists {
-		go func() {
-			g.Stop()
-		}()
-		c.Status(http.StatusNoContent)
+	err := gm.StopGenerator(name)
+
+	if err == nil {
+		c.Status(http.StatusOK)
 	} else {
 		c.Status(http.StatusNotFound)
 	}

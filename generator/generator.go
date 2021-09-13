@@ -47,11 +47,7 @@ func (g *Generator) Stop() error {
 }
 
 func (g *Generator) Run(timeout time.Duration) error {
-	log.Printf("Run generator &v ", *g)
-	log.Printf("Generator address %p ", g)
 	g.Status = STATUS_RUNNING
-	log.Printf("Run generator &v ", *g)
-	log.Printf("Generator address %p ", g)
 	g.Source.Run()
 
 	// Test to run for a while
@@ -67,11 +63,7 @@ func (g *Generator) Run(timeout time.Duration) error {
 		//log.Printf("%v, %v \n", events, ok)
 		if !ok {
 			log.Printf("generator stopped, with total generated event %d, sink event %d", g.Source.Counter, g.Sink.Count())
-			log.Printf("Run generator &v ", *g)
-			log.Printf("Generator address %p ", g)
 			g.Status = STATUS_STOPPED
-			log.Printf("Run generator &v ", *g)
-			log.Printf("Generator address %p ", g)
 			break
 		}
 

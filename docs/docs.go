@@ -203,7 +203,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": ""
                     },
                     "404": {
@@ -270,7 +270,7 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": ""
                     },
                     "404": {

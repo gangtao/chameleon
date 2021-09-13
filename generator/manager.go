@@ -15,7 +15,7 @@ const CONFIG_DIR = "config"
 
 //TODO : should store pointer to the generator instead of the object
 type GeneratorManager struct {
-	Manager map[string]Generator
+	Manager map[string]*Generator
 }
 
 var lock = &sync.Mutex{}
@@ -35,7 +35,7 @@ func NewGeneratorManager() *GeneratorManager {
 
 	if instance == nil {
 		instance = &GeneratorManager{
-			Manager: make(map[string]Generator), // <-- thread safe
+			Manager: make(map[string]*Generator), // <-- thread safe
 		}
 
 		// load all generator from file
@@ -69,7 +69,7 @@ func (gm *GeneratorManager) CreateGenerator(config *GeneratorConfig) error {
 
 	//TODO : validate the name should be a valid file name
 
-	gm.Manager[name] = *g
+	gm.Manager[name] = g
 
 	//save config to config folder
 	path := fmt.Sprintf("%s/%s.json", CONFIG_DIR, name)
@@ -109,9 +109,46 @@ func (gm *GeneratorManager) DeleteGenerator(name string) error {
 	return errors.New("Generator does not exist")
 }
 
+func (gm *GeneratorManager) StartGenerator(name string) error {
+	g, exists := gm.Manager[name]
+	if exists {
+		switch status := g.Status; status {
+		case STATUS_INIT:
+			go func() {
+				g.Run(1000 * 1000)
+			}()
+			return nil
+		case STATUS_RUNNING:
+			log.Println("the generator is in running state")
+			return nil
+		default:
+			new_generator := NewGenerator(&g.Config)
+			gm.Manager[name] = new_generator
+			go func() {
+				new_generator.Run(1000 * 1000)
+			}()
+			return nil
+			return nil
+		}
+
+	}
+	return errors.New("Generator does not exist")
+}
+
+func (gm *GeneratorManager) StopGenerator(name string) error {
+	g, exists := gm.Manager[name]
+	if exists {
+		go func() {
+			g.Stop()
+		}()
+		return nil
+	}
+
+	return errors.New("Generator does not exist")
+}
+
 func (gm *GeneratorManager) GetGeneratorStatus(name string) (*GeneratorStatus, error) {
 	g, exists := gm.Manager[name]
-	log.Printf("Generator address %p ", &g)
 	if exists {
 		status := GeneratorStatus{
 			Status:      g.Status,
