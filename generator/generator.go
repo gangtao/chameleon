@@ -61,7 +61,7 @@ func (g *Generator) Run(timeout time.Duration) error {
 
 	for {
 		events, ok := <-g.Source.EventChannel
-		log.Printf("%v, %v \n", events, ok)
+		//log.Printf("%v, %v \n", events, ok)
 		if !ok {
 			log.Printf("generator stopped, with total generated event %d, sink event %d", g.Source.Counter, g.Sink.Count())
 			break

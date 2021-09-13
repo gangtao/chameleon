@@ -92,7 +92,7 @@ func StartGenerator(c *gin.Context) {
 	gm := c.MustGet("gm").(*generator.GeneratorManager)
 	g := gm.Manager[name]
 	go func() {
-		g.Run(1000)
+		g.Run(1000 * 1000)
 	}()
 	c.Status(http.StatusNoContent)
 }

@@ -67,10 +67,9 @@ func (s *KafkaSink) Write(events *[]*source.Event) error {
 	err := s.Writer.WriteMessages(context.Background(), messages...)
 
 	if err != nil {
-		log.Fatal("failed to write messages:", err)
+		log.Println("failed to write messages")
 	} else {
 		s.Counter += len(*events)
-		log.Println("send data to sink kafka")
 	}
 
 	return err
