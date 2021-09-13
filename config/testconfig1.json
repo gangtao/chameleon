@@ -1,0 +1,58 @@
+{
+ "name": "testconfig1",
+ "sink": {
+  "name": "sinkname",
+  "type": "kafka",
+  "config": {
+   "brokers": [
+    "localhost:9092",
+    "localhost:9093",
+    "localhost:9094"
+   ],
+   "topic": "topic-A"
+  }
+ },
+ "source": {
+  "name": "sourcename",
+  "timestamp_field": "f1",
+  "batch_size": 2,
+  "concurrency": 1,
+  "interval": [
+   10,
+   100
+  ],
+  "fields": [
+   {
+    "name": "f1",
+    "type": "timestamp"
+   },
+   {
+    "name": "f2",
+    "type": "string",
+    "range": [
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   {
+    "name": "f3",
+    "type": "int",
+    "range": [
+     1,
+     5,
+     30
+    ]
+   },
+   {
+    "name": "f4",
+    "type": "float",
+    "range": [
+     1.2,
+     5.5,
+     30.2
+    ]
+   }
+  ]
+ }
+}

@@ -5,8 +5,6 @@ import (
 	"chameleon/source"
 	"log"
 	"time"
-
-	uuid "github.com/satori/go.uuid"
 )
 
 type StatusType string
@@ -25,7 +23,6 @@ type GeneratorConfig struct {
 }
 
 type Generator struct {
-	Id     string
 	Status StatusType
 	Config GeneratorConfig
 	Source *source.EventGenerator
@@ -36,7 +33,6 @@ func NewGenerator(config *GeneratorConfig) *Generator {
 	//TODO: support other sink type as well
 	kafkaSink := sink.NewKafkaSink(&config.Sink)
 	generator := Generator{
-		Id:     uuid.NewV4().String(),
 		Status: STATUS_INIT,
 		Config: *config,
 		Source: source.NewEventGenerator(&config.Source),
@@ -44,6 +40,10 @@ func NewGenerator(config *GeneratorConfig) *Generator {
 	}
 
 	return &generator
+}
+
+func (g *Generator) Stop() error {
+	return nil
 }
 
 func (g *Generator) Run(timeout time.Duration) error {

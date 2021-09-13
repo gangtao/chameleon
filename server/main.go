@@ -7,7 +7,8 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	handlers "chameleon/handlers"
+	"chameleon/generator"
+	"chameleon/handlers"
 
 	_ "chameleon/docs"
 )
@@ -27,12 +28,25 @@ import (
 // @BasePath /
 // @schemes http
 
+func Generator() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("gm", generator.NewGeneratorManager())
+		c.Next()
+	}
+}
+
 func main() {
 	// Gin instance
 	r := gin.New()
+	r.Use(Generator())
 
 	// Routes
 	r.GET("/", handlers.HealthCheck)
+
+	r.GET("/test", func(c *gin.Context) {
+		gm := c.MustGet("gm").(*generator.GeneratorManager)
+		log.Printf("manager is %v", gm)
+	})
 
 	// Generator
 	r.POST("/generators", handlers.CreateGenerator)

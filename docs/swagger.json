@@ -225,6 +225,79 @@
             "properties": {
                 "name": {
                     "type": "string"
+                },
+                "sink": {
+                    "$ref": "#/definitions/sink.SinkConfiguration"
+                },
+                "source": {
+                    "$ref": "#/definitions/source.SourceConfiguration"
+                }
+            }
+        },
+        "sink.SinkConfiguration": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "source.SourceConfiguration": {
+            "type": "object",
+            "properties": {
+                "batch_size": {
+                    "type": "integer"
+                },
+                "concurrency": {
+                    "type": "integer"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/source.SourceField"
+                    }
+                },
+                "interval": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "timestamp_field": {
+                    "type": "string"
+                }
+            }
+        },
+        "source.SourceField": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "range": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         }

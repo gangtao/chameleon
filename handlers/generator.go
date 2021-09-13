@@ -19,12 +19,18 @@ import (
 // @Success 201 {object} generator.GeneratorConfig
 // @Router /generators [post]
 func CreateGenerator(c *gin.Context) {
-	json := generator.GeneratorConfig{}
-	c.BindJSON(&json)
+	config := generator.GeneratorConfig{}
 
-	log.Printf("%v", &json)
-
-	c.JSON(http.StatusCreated, json)
+	if c.ShouldBind(&config) == nil {
+		log.Printf("%v", &config)
+		gm := c.MustGet("gm").(*generator.GeneratorManager)
+		err := gm.CreateGenerator(&config)
+		if err != nil {
+			c.Status(http.StatusConflict)
+		} else {
+			c.JSON(http.StatusCreated, config)
+		}
+	}
 }
 
 // ListGenerator godoc
@@ -36,9 +42,8 @@ func CreateGenerator(c *gin.Context) {
 // @Success 200 {array} string
 // @Router /generators [get]
 func ListGenerator(c *gin.Context) {
-	res := [3]string{"a", "b", "c"}
-
-	c.JSON(http.StatusOK, res)
+	gm := c.MustGet("gm").(*generator.GeneratorManager)
+	c.JSON(http.StatusOK, gm.ListGenerator())
 }
 
 // GetGenerator godoc
@@ -52,9 +57,8 @@ func ListGenerator(c *gin.Context) {
 // @Router /generators/{name} [get]
 func GetGenerator(c *gin.Context) {
 	name := c.Param("name")
-	log.Printf("%s", name)
-
-	res := generator.GeneratorConfig{Name: name}
+	gm := c.MustGet("gm").(*generator.GeneratorManager)
+	res := gm.Manager[name].Config
 	c.JSON(http.StatusOK, res)
 }
 
@@ -69,7 +73,8 @@ func GetGenerator(c *gin.Context) {
 // @Router /generators/{name} [delete]
 func DeleteGenerator(c *gin.Context) {
 	name := c.Param("name")
-	log.Printf("%s", name)
+	gm := c.MustGet("gm").(*generator.GeneratorManager)
+	gm.DeleteGenerator(name)
 	c.Status(http.StatusNoContent)
 }
 
@@ -84,7 +89,11 @@ func DeleteGenerator(c *gin.Context) {
 // @Router /generators/{name}/start [post]
 func StartGenerator(c *gin.Context) {
 	name := c.Param("name")
-	log.Printf("%s", name)
+	gm := c.MustGet("gm").(*generator.GeneratorManager)
+	g := gm.Manager[name]
+	go func() {
+		g.Run(1000)
+	}()
 	c.Status(http.StatusNoContent)
 }
 
@@ -99,6 +108,10 @@ func StartGenerator(c *gin.Context) {
 // @Router /generators/{name}/stop [post]
 func StopGenerator(c *gin.Context) {
 	name := c.Param("name")
-	log.Printf("%s", name)
+	gm := c.MustGet("gm").(*generator.GeneratorManager)
+	g := gm.Manager[name]
+	go func() {
+		g.Stop()
+	}()
 	c.Status(http.StatusNoContent)
 }
