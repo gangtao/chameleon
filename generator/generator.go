@@ -43,6 +43,7 @@ func NewGenerator(config *GeneratorConfig) *Generator {
 }
 
 func (g *Generator) Stop() error {
+	g.Source.Stop()
 	return nil
 }
 

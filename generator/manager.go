@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 )
 
 const CONFIG_DIR = "config"
@@ -109,13 +110,13 @@ func (gm *GeneratorManager) DeleteGenerator(name string) error {
 	return errors.New("Generator does not exist")
 }
 
-func (gm *GeneratorManager) StartGenerator(name string) error {
+func (gm *GeneratorManager) StartGenerator(name string, timeout time.Duration) error {
 	g, exists := gm.Manager[name]
 	if exists {
 		switch status := g.Status; status {
 		case STATUS_INIT:
 			go func() {
-				g.Run(1000 * 1000)
+				g.Run(timeout)
 			}()
 			return nil
 		case STATUS_RUNNING:
@@ -125,7 +126,7 @@ func (gm *GeneratorManager) StartGenerator(name string) error {
 			new_generator := NewGenerator(&g.Config)
 			gm.Manager[name] = new_generator
 			go func() {
-				new_generator.Run(1000 * 1000)
+				new_generator.Run(timeout)
 			}()
 			return nil
 			return nil

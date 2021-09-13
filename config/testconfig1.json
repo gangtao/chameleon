@@ -16,10 +16,10 @@
   "name": "sourcename",
   "timestamp_field": "f1",
   "batch_size": 2,
-  "concurrency": 1,
+  "concurrency": 2,
   "interval": [
-   10,
-   100
+   10000,
+   20000
   ],
   "fields": [
    {

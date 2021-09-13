@@ -4,6 +4,8 @@ import (
 	"chameleon/generator"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -98,19 +100,29 @@ func DeleteGenerator(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param name path string true "configuration name"
+// @param timeout query int false "timeout for generating"
 // @Success 200
 // @Failure 404
 // @Router /generators/{name}/start [post]
 func StartGenerator(c *gin.Context) {
 	name := c.Param("name")
-	gm := c.MustGet("gm").(*generator.GeneratorManager)
-	err := gm.StartGenerator(name)
+	timeout := c.DefaultQuery("timeout", "0")
+	timeout_int, err := strconv.Atoi(timeout)
 
 	if err == nil {
-		c.Status(http.StatusOK)
+		gm := c.MustGet("gm").(*generator.GeneratorManager)
+		err = gm.StartGenerator(name, time.Duration(timeout_int))
+
+		if err == nil {
+			c.Status(http.StatusOK)
+		} else {
+			c.Status(http.StatusNotFound)
+		}
+
 	} else {
-		c.Status(http.StatusNotFound)
+		c.Status(http.StatusInternalServerError)
 	}
+
 }
 
 // StopGenerator godoc

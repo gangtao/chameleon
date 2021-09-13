@@ -184,6 +184,10 @@ paths:
         name: name
         required: true
         type: string
+      - description: timeout for generating
+        in: query
+        name: timeout
+        type: integer
       produces:
       - application/json
       responses:

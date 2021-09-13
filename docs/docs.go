@@ -200,6 +200,12 @@ var doc = `{
                         "name": "name",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "timeout for generating",
+                        "name": "timeout",
+                        "in": "query"
                     }
                 ],
                 "responses": {
