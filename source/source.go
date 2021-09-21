@@ -19,12 +19,13 @@ const (
 )
 
 type SourceField struct {
-	Name            string          `json:"name"`
-	Type            SourceFieldType `json:"type"`
-	Range           []interface{}   `json:"range,omitempty"`
-	Limit           []interface{}   `json:"limit,omitempty"`
-	TimestampFormat string          `json:"timestamp_format,omitempty"`
-	TimestampDelay  int             `json:"timestamp_delay,omitempty"`
+	Name              string          `json:"name"`
+	Type              SourceFieldType `json:"type"`
+	Range             []interface{}   `json:"range,omitempty"`
+	Limit             []interface{}   `json:"limit,omitempty"`
+	TimestampFormat   string          `json:"timestamp_format,omitempty"`
+	TimestampDelayMin int             `json:"timestamp_delay_min,omitempty"`
+	TimestampDelayMax int             `json:"timestamp_delay_max,omitempty"`
 }
 
 type SourceConfiguration struct {
@@ -61,18 +62,23 @@ func NewEventGenerator(source *SourceConfiguration) *EventGenerator {
 	return &generator
 }
 
-func makeTimestamp(timestampDeley int) int64 {
+func makeTimestamp(timestampDeleyMin int, timestampDeleyMax int) int64 {
 	now := time.Now()
-	//TODO: random delay here
+	faker := fake.New(0)
+	delay := faker.Number(timestampDeleyMin, timestampDeleyMax)
 	nsec := now.UnixNano() / 1000 // using micro second as unit
-	return nsec - int64(timestampDeley)
+	return nsec - int64(delay)
 }
 
-func makeTimestampString(format *string, timestampDeley int) string {
+func makeTimestampString(format *string, timestampDeleyMin int, timestampDeleyMax int) string {
 	now := time.Now()
 	nsec := now.UnixNano() / 1000
-	//TODO: random delay here
-	t := nsec - int64(timestampDeley)
+	faker := fake.New(0)
+	delay := faker.Number(timestampDeleyMin, timestampDeleyMax)
+
+	log.Printf("timestamp with delay: %d \n", delay)
+
+	t := nsec - int64(delay)
 	timestamp := time.UnixMicro(t)
 
 	return timestamp.Format(*format)
@@ -120,16 +126,18 @@ func makeString(ranges *[]string) string {
 	return faker.LetterN(8)
 }
 
-func makeValue(sourceType *SourceFieldType, sourceRange *[]interface{}, sourceLimit *[]interface{}, timestampFormat *string, timestampDeley int) interface{} {
+func makeValue(sourceType *SourceFieldType, sourceRange *[]interface{}, sourceLimit *[]interface{},
+	timestampFormat *string, TimestampDelayMin int, TimestampDelayMax int) interface{} {
 	switch s := *sourceType; s {
 	case FIELDTYPE_TIMESTAMP:
 		//log.Printf("timestamp with format : %s \n", *timestampFormat)
-		//log.Printf("timestamp with delay : %d \n", timestampDeley)
+		//log.Printf("timestamp with delay min: %d \n", TimestampDelayMin)
+		//log.Printf("timestamp with delay max: %d \n", TimestampDelayMax)
 
 		if *timestampFormat == "int" || *timestampFormat == "" {
-			return makeTimestamp(timestampDeley)
+			return makeTimestamp(TimestampDelayMin, TimestampDelayMax)
 		} else {
-			return makeTimestampString(timestampFormat, timestampDeley)
+			return makeTimestampString(timestampFormat, TimestampDelayMin, TimestampDelayMax)
 		}
 
 	case FIELDTYPE_STRING:
@@ -173,7 +181,7 @@ func (s *EventGenerator) generateEvent() *Event {
 	faker := fake.New(0)
 
 	for _, f := range fields {
-		value[f.Name] = makeValue(&f.Type, &f.Range, &f.Limit, &f.TimestampFormat, f.TimestampDelay)
+		value[f.Name] = makeValue(&f.Type, &f.Range, &f.Limit, &f.TimestampFormat, f.TimestampDelayMin, f.TimestampDelayMax)
 	}
 
 	event := Event{

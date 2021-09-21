@@ -1,5 +1,5 @@
 {
- "name": "config",
+ "name": "people",
  "sink": {
   "name": "sinkname",
   "type": "kafka",
@@ -22,7 +22,10 @@
   "fields": [
    {
     "name": "t",
-    "type": "timestamp"
+    "type": "timestamp",
+    "timestamp_format" : "2006-01-02 15:04:05.000000000",
+    "timestamp_delay_min" : 1000,
+    "timestamp_delay_max" : 2000
    },
    {
     "name": "name",

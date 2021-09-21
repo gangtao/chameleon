@@ -1,8 +1,10 @@
+# create table with event time and water mark control
 CREATE TABLE people (
  name VARCHAR,
  country VARCHAR,
  age INT,
- t BIGINT
+ t TIMESTAMP(3),
+ WATERMARK FOR t AS t - INTERVAL '1' SECOND
 ) WITH (
   'connector' = 'kafka',
   'property-version' = 'universal',
@@ -12,3 +14,86 @@ CREATE TABLE people (
   'value.format' = 'json',
   'properties.group.id' = 'my-working-group'
 );
+
+
+# aggregation
+SELECT name, COUNT(*) 
+FROM people 
+GROUP BY name;
+
+SELECT name, SUM(age) 
+FROM people 
+GROUP BY name;
+
+# distinct aggregation
+SELECT country, COUNT(DISTINCT name)
+FROM people
+GROUP BY country;
+
+# filter
+SELECT *
+FROM people
+WHERE age > 40;
+
+# tumbling window
+SELECT * FROM TABLE(
+   TUMBLE(TABLE people, DESCRIPTOR(t), INTERVAL '1' MINUTES));
+
+SELECT * FROM TABLE(
+   TUMBLE(
+     DATA => TABLE people,
+     TIMECOL => DESCRIPTOR(t),
+     SIZE => INTERVAL '1' SECOND));
+
+SELECT window_start, window_end, name, COUNT(*)
+  FROM TABLE(
+    TUMBLE(TABLE people, DESCRIPTOR(t), INTERVAL '10' SECOND))
+  GROUP BY window_start, window_end, name;
+
+# hopping window
+SELECT window_start, window_end, country, SUM(age)
+  FROM TABLE(
+    HOP(TABLE people, DESCRIPTOR(t), INTERVAL '2' SECOND, INTERVAL '10' SECOND))
+  GROUP BY window_start, window_end, country;
+
+# windowed top N
+
+
+# join
+
+CREATE TABLE lookup (
+ name VARCHAR,
+ fullname VARCHAR,
+ t TIMESTAMP(3),
+ PRIMARY KEY(name) NOT ENFORCED,
+ WATERMARK FOR t AS t - INTERVAL '1' SECOND
+) WITH (
+  'connector' = 'kafka',
+  'property-version' = 'universal',
+  'properties.bootstrap.servers' = 'kafka:9092',
+  'topic' = 'topic-B',
+  'scan.startup.mode' = 'earliest-offset',
+  'value.format' = 'json',
+  'properties.group.id' = 'my-working-group'
+);
+
+SELECT * FROM people
+JOIN lookup FOR SYSTEM_TIME AS OF people.t
+ON people.name = lookup.name
+
+CREATE TABLE fullname (
+    name VARCHAR,
+    fullname VARCHAR
+) WITH ( 
+    'connector' = 'filesystem',
+    'path' = '/data/lookup.csv',
+    'format' = 'csv'
+);
+
+SELECT * FROM people
+JOIN fullname FOR SYSTEM_TIME AS OF people.t
+ON people.name = fullname.name
+
+
+# windowed join
+No
