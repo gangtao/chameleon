@@ -15,6 +15,7 @@
  "source": {
   "name": "sourcename",
   "timestamp_field": "f1",
+  "key_field" : "f2",
   "batch_size": 2,
   "concurrency": 2,
   "interval": [

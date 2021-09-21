@@ -1,0 +1,48 @@
+{
+    "name": "lookup",
+    "sink": {
+        "name": "sinkname",
+        "type": "kafka",
+        "config": {
+            "brokers": [
+                "kafka:9092"
+            ],
+            "topic": "topic-B"
+        }
+    },
+    "source": {
+        "name": "sourcename",
+        "batch_size": 1,
+        "concurrency": 1,
+        "timestamp_field": "t",
+        "key_field" : "name",
+        "interval": [
+            10000000
+        ],
+        "fields": [
+            {
+                "name": "t",
+                "type": "timestamp",
+                "timestamp_format": "2006-01-02 15:04:05.000000000"
+            },
+            {
+                "name": "name",
+                "type": "string",
+                "range": [
+                    "Jon",
+                    "Ava",
+                    "Pino"
+                ]
+            },
+            {
+                "name": "fullname",
+                "type": "string",
+                "range": [
+                    "Jon, SA",
+                    "Ava, SB",
+                    "Pino, SC"
+                ]
+            }
+        ]
+    }
+}

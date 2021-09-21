@@ -3,11 +3,11 @@ FROM KAFKA BROKER 'kafka:9092' TOPIC 'topic-A'
 FORMAT BYTES;
 
 CREATE MATERIALIZED VIEW people_view AS
-  SELECT CAST(data AS jsonb) AS data, 
-  FROM (
-      SELECT convert_from(data, 'utf8') AS data
-      FROM people
-  );
+SELECT CAST(data AS JSONB) AS data
+FROM (
+    SELECT CONVERT_FROM(data, 'utf8') AS data
+    FROM people
+)
 
 # JSON to Table
 SELECT (data)::jsonb->'name' AS name, 
@@ -28,8 +28,39 @@ CREATE MATERIALIZED VIEW people_view_count AS
     FROM people_view_table 
     GROUP BY name;
 
+SELECT *, mz_logical_timestamp() FROM people_view_count;
+
 # sink
 CREATE SINK people_count_sink
 FROM people_view_count
 INTO KAFKA BROKER 'kafka:9092' TOPIC 'people-count'
+FORMAT JSON;
+
+# another table
+CREATE SOURCE lookup
+FROM KAFKA BROKER 'kafka:9092' TOPIC 'topic-B'
+FORMAT BYTES;
+
+CREATE MATERIALIZED VIEW lookip_view AS
+SELECT CAST(data AS JSONB) AS data
+FROM (
+    SELECT CONVERT_FROM(data, 'utf8') AS data
+    FROM lookup
+)
+
+# JSON to Table
+CREATE MATERIALIZED VIEW lookup_view_table AS
+    SELECT (data)::jsonb->'name' AS name, 
+        (data)::jsonb->'fullname' AS fullname
+    FROM lookip_view;
+
+CREATE MATERIALIZED VIEW people_join AS
+    SELECT people_view_table.name, lookup_view_table.fullname, COUNT(people_view_table.age)
+        FROM people_view_table
+        JOIN lookup_view_table ON people_view_table.name = lookup_view_table.name
+        GROUP BY people_view_table.name, lookup_view_table.fullname
+
+CREATE SINK people_join_sink
+FROM people_join
+INTO KAFKA BROKER 'kafka:9092' TOPIC 'JoinResult'
 FORMAT JSON;

@@ -1,5 +1,5 @@
 {
- "name": "config",
+ "name": "people",
  "sink": {
   "name": "sinkname",
   "type": "kafka",
@@ -13,6 +13,7 @@
  "source": {
   "name": "sourcename",
   "timestamp_field": "t",
+  "key_field" : "name",
   "batch_size": 2,
   "concurrency": 2,
   "interval": [
@@ -22,6 +23,13 @@
   "fields": [
    {
     "name": "t",
+    "type": "timestamp",
+    "timestamp_format" : "2006-01-02T15:04:05",
+    "timestamp_delay_min" : 1000,
+    "timestamp_delay_max" : 2000
+   },
+   {
+    "name": "ts",
     "type": "timestamp"
    },
    {

@@ -31,6 +31,7 @@ type SourceField struct {
 type SourceConfiguration struct {
 	Name           string        `json:"name,omitempty"`
 	TimestampField string        `json:"timestamp_field,omitempty"`
+	KeyField       string        `json:"key_field,omitempty"`
 	BatchSize      int           `json:"batch_size,omitempty"`
 	Concurrency    int           `json:"concurrency,omitempty"`
 	Internval      []int         `json:"interval,omitempty"`
@@ -178,14 +179,25 @@ func makeValue(sourceType *SourceFieldType, sourceRange *[]interface{}, sourceLi
 func (s *EventGenerator) generateEvent() *Event {
 	value := make(map[string]interface{})
 	fields := s.Config.Fields
-	faker := fake.New(0)
 
 	for _, f := range fields {
 		value[f.Name] = makeValue(&f.Type, &f.Range, &f.Limit, &f.TimestampFormat, f.TimestampDelayMin, f.TimestampDelayMax)
 	}
 
+	keyField := s.Config.KeyField
+	var key string
+
+	if keyField == "" {
+		faker := fake.New(0)
+		key = faker.LetterN(8)
+		//log.Printf("generate random key: %s \n", key)
+	} else {
+		key = value[keyField].(string)
+		//log.Printf("use key %s from field %s \n", key, keyField)
+	}
+
 	event := Event{
-		Key:   faker.LetterN(8),
+		Key:   key,
 		Value: value,
 	}
 

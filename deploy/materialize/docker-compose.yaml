@@ -29,7 +29,7 @@ services:
       - kafka
 
   chameleon:
-    image: naughtytao/chameleon:0.1.20210913
+    image: naughtytao/chameleon:0.1.20210921
     ports:
       - "3000:3000"
     volumes:
