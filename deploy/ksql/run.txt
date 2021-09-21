@@ -1,0 +1,25 @@
+CREATE STREAM people (
+    name VARCHAR,
+    country VARCHAR,
+    age INT,
+    t BIGINT
+  ) WITH (
+    KAFKA_TOPIC = 'topic-A',
+    PARTITIONS=1, 
+    REPLICAS=1,
+    VALUE_FORMAT = 'JSON'
+  );
+
+  INSERT INTO people (NAME, COUNTRY, AGE, T) VALUES ('Pino', 'USA', 30, 1631833176748900);
+
+
+CREATE STREAM pageviews (
+    page_id BIGINT
+  ) WITH (
+    KAFKA_TOPIC = 'keyed-pageviews-topic',
+    PARTITIONS=1, 
+    REPLICAS=1,
+    VALUE_FORMAT = 'JSON'
+  );
+
+  INSERT INTO pageviews (PAGE_ID) VALUES ('1631833176748900');

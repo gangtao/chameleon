@@ -47,6 +47,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   chameleon:
-    image: naughtytao/chameleon:0.1.20210913
+    image: naughtytao/chameleon:0.1.20210921
     ports:
       - "3000:3000"

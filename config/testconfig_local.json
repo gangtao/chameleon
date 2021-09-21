@@ -1,5 +1,5 @@
 {
- "name": "testconfig1",
+ "name": "testconfig_local",
  "sink": {
   "name": "sinkname",
   "type": "kafka",
@@ -24,7 +24,8 @@
   "fields": [
    {
     "name": "f1",
-    "type": "timestamp"
+    "type": "timestamp",
+    "timestamp_format" : "2006-01-02 15:04:05.000000000"
    },
    {
     "name": "f2",

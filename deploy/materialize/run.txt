@@ -1,0 +1,35 @@
+CREATE SOURCE people
+FROM KAFKA BROKER 'kafka:9092' TOPIC 'topic-A'
+FORMAT BYTES;
+
+CREATE MATERIALIZED VIEW people_view AS
+  SELECT CAST(data AS jsonb) AS data, 
+  FROM (
+      SELECT convert_from(data, 'utf8') AS data
+      FROM people
+  );
+
+# JSON to Table
+SELECT (data)::jsonb->'name' AS name, 
+    (data)::jsonb->'age' AS age, 
+    (data)::jsonb->'country' AS country,  
+    (data)::jsonb->'t' AS t
+FROM people_view;
+
+CREATE MATERIALIZED VIEW people_view_table AS
+    SELECT (data)::jsonb->'name' AS name, 
+        (data)::jsonb->'age' AS age, 
+        (data)::jsonb->'country' AS country,  
+        (data)::jsonb->'t' AS t
+    FROM people_view;
+
+CREATE MATERIALIZED VIEW people_view_count AS
+    SELECT count(*), name 
+    FROM people_view_table 
+    GROUP BY name;
+
+# sink
+CREATE SINK people_count_sink
+FROM people_view_count
+INTO KAFKA BROKER 'kafka:9092' TOPIC 'people-count'
+FORMAT JSON;

@@ -1,0 +1,14 @@
+CREATE TABLE people (
+ name VARCHAR,
+ country VARCHAR,
+ age INT,
+ t BIGINT
+) WITH (
+  'connector' = 'kafka',
+  'property-version' = 'universal',
+  'properties.bootstrap.servers' = 'kafka:9092',
+  'topic' = 'topic-A',
+  'scan.startup.mode' = 'earliest-offset',
+  'value.format' = 'json',
+  'properties.group.id' = 'my-working-group'
+);
