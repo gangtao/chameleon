@@ -1,25 +1,114 @@
 CREATE STREAM people (
-    name VARCHAR,
+    name VARCHAR KEY,
     country VARCHAR,
     age INT,
-    t BIGINT
+    t VARCHAR,
+    ts BIGINT
   ) WITH (
     KAFKA_TOPIC = 'topic-A',
     PARTITIONS=1, 
     REPLICAS=1,
-    VALUE_FORMAT = 'JSON'
+    VALUE_FORMAT = 'JSON',
+    timestamp='t',
+    timestamp_format='yyyy-MM-dd''T''HH:mm:ss'
   );
 
-  INSERT INTO people (NAME, COUNTRY, AGE, T) VALUES ('Pino', 'USA', 30, 1631833176748900);
+# insert into stream
+INSERT INTO people (NAME, COUNTRY, AGE, T) VALUES ('Pino', 'USA', 30, 1631833176748900);
 
+# query all
+SELECT * 
+FROM people
+EMIT CHANGES;
 
-CREATE STREAM pageviews (
-    page_id BIGINT
+# aggregation
+SELECT name, COUNT(*) 
+FROM people 
+GROUP BY name
+EMIT CHANGES;
+
+SELECT name, SUM(age) 
+FROM people 
+GROUP BY name
+EMIT CHANGES;
+
+# do not support disctinct like this
+SELECT country, COUNT(DISTINCT name)
+FROM people
+GROUP BY country
+EMIT CHANGES;
+
+# filter
+SELECT *
+FROM people
+WHERE age > 40
+EMIT CHANGES;
+
+# tumbling window
+SELECT WINDOWSTART, WINDOWEND, name, SUM(age)
+  FROM people
+  WINDOW TUMBLING (SIZE 10 SECONDS)
+  GROUP BY name
+  EMIT CHANGES;
+
+# hopping window
+SELECT WINDOWSTART, WINDOWEND, country, COUNT(*)
+  FROM people
+  WINDOW HOPPING (SIZE 20 SECONDS, ADVANCE BY 5 SECONDS)
+  GROUP BY country
+  EMIT CHANGES;
+
+# session window
+support
+
+# out of order using GRACE PERIOD
+SELECT orderzip_code, TOPK(order_total, 5) FROM orders
+  WINDOW TUMBLING (SIZE 1 HOUR, GRACE PERIOD 2 HOURS) 
+  GROUP BY order_zipcode
+  EMIT CHANGES;
+
+# Another stream
+CREATE STREAM fullname_stream (
+    name VARCHAR KEY,
+    fullname VARCHAR
   ) WITH (
-    KAFKA_TOPIC = 'keyed-pageviews-topic',
+    KAFKA_TOPIC = 'topic-B',
     PARTITIONS=1, 
     REPLICAS=1,
     VALUE_FORMAT = 'JSON'
   );
 
-  INSERT INTO pageviews (PAGE_ID) VALUES ('1631833176748900');
+# Another table
+CREATE TABLE fullname_table (
+    name VARCHAR PRIMARY KEY,
+    fullname VARCHAR
+  ) WITH (
+    KAFKA_TOPIC = 'topic-B',
+    PARTITIONS=1, 
+    REPLICAS=1,
+    VALUE_FORMAT = 'JSON'
+  );
+
+# Join two streams, 
+CREATE STREAM p1 AS
+  SELECT 
+    fullname_stream.fullname AS fullname, 
+    people.name AS name,
+    country, 
+    age,
+    t
+  FROM people
+    LEFT JOIN fullname_stream WITHIN 3 SECONDS ON people.name = fullname_stream.name
+  EMIT CHANGES;
+
+# Join stream with table
+SELECT 
+    fullname_table.fullname AS fullname, 
+    people.name AS name,
+    country, 
+    age 
+FROM people
+  JOIN fullname_table ON people.name = fullname_table.name
+EMIT CHANGES;
+
+# join two tables
