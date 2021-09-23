@@ -98,7 +98,7 @@ CREATE STREAM p1 AS
     age,
     t
   FROM people
-    LEFT JOIN fullname_stream WITHIN 3 SECONDS ON people.name = fullname_stream.name
+    LEFT JOIN fullname_stream WITHIN 20 SECONDS ON people.name = fullname_stream.name
   EMIT CHANGES;
 
 # Join stream with table

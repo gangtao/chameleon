@@ -1,10 +1,12 @@
 # create table with event time and water mark control
 CREATE TABLE people (
- name VARCHAR,
- country VARCHAR,
- age INT,
- t TIMESTAMP(3),
- WATERMARK FOR t AS t - INTERVAL '1' SECOND
+ `name` VARCHAR,
+ `country` VARCHAR,
+ `age` INT,
+ `pt` AS PROCTIME(),
+ `t` TIMESTAMP(3),
+ `timestamp` TIMESTAMP_LTZ(3) METADATA ,
+  WATERMARK FOR t AS t - INTERVAL '1' SECOND
 ) WITH (
   'connector' = 'kafka',
   'property-version' = 'universal',
@@ -15,10 +17,23 @@ CREATE TABLE people (
   'properties.group.id' = 'my-working-group'
 );
 
+# mode
+SET 'sql-client.execution.result-mode' = 'changelog';
+SET 'sql-client.execution.result-mode' = 'table';
+SET 'sql-client.execution.result-mode' = 'tableau';  
+
+# checking latancy
+SELECT CAST(UNIX_TIMESTAMP(CAST(pt AS STRING)) as BIGINT)  - CAST(UNIX_TIMESTAMP(CAST(t AS STRING)) as BIGINT) 
+FROM people;
+
+https://issues.apache.org/jira/browse/FLINK-19200
 
 # aggregation
-SELECT name, COUNT(*) 
+SELECT name, SUM(C) 
+FROM 
+( SELECT name, COUNT(*) as C
 FROM people 
+GROUP BY name) 
 GROUP BY name;
 
 SELECT name, SUM(age) 
@@ -60,13 +75,40 @@ SELECT window_start, window_end, country, SUM(age)
 
 
 # join
+CREATE TABLE fullname (
+    name VARCHAR,
+    fullname VARCHAR
+) WITH ( 
+    'connector' = 'filesystem',
+    'path' = '/data/lookup.csv',
+    'format' = 'csv'
+);
 
+CREATE TABLE phone (
+    name VARCHAR,
+    phone VARCHAR
+) WITH ( 
+    'connector' = 'filesystem',
+    'path' = '/data/phone.csv',
+    'format' = 'csv'
+);
+
+SELECT fullname.name, fullname.fullname, phone.phone
+FROM fullname
+JOIN phone
+ON fullname.name = phone.name
+
+# stream/table join
+SELECT people.name, fullname.fullname
+FROM people
+JOIN fullname
+ON people.name = fullname.name
+
+# stream to stream join
 CREATE TABLE lookup (
- name VARCHAR,
- fullname VARCHAR,
- t TIMESTAMP(3),
- PRIMARY KEY(name) NOT ENFORCED,
- WATERMARK FOR t AS t - INTERVAL '1' SECOND
+ `name` VARCHAR,
+ `fullname` VARCHAR,
+ `pt` AS PROCTIME()
 ) WITH (
   'connector' = 'kafka',
   'property-version' = 'universal',
@@ -77,23 +119,9 @@ CREATE TABLE lookup (
   'properties.group.id' = 'my-working-group'
 );
 
-SELECT * FROM people
-JOIN lookup FOR SYSTEM_TIME AS OF people.t
+# interval join
+SELECT people.name, people.age, people.country, people.pt, lookup.fullname
+FROM people
+LEFT JOIN lookup 
 ON people.name = lookup.name
-
-CREATE TABLE fullname (
-    name VARCHAR,
-    fullname VARCHAR
-) WITH ( 
-    'connector' = 'filesystem',
-    'path' = '/data/lookup.csv',
-    'format' = 'csv'
-);
-
-SELECT * FROM people
-JOIN fullname FOR SYSTEM_TIME AS OF people.t
-ON people.name = fullname.name
-
-
-# windowed join
-No
+AND people.pt BETWEEN lookup.pt - INTERVAL '5' SECOND AND lookup.pt

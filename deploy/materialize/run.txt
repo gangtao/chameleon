@@ -20,7 +20,8 @@ CREATE MATERIALIZED VIEW people_view_table AS
     SELECT (data)::jsonb->'name' AS name, 
         (data)::jsonb->'age' AS age, 
         (data)::jsonb->'country' AS country,  
-        (data)::jsonb->'t' AS t
+        (data)::jsonb->'t' AS t,
+        (data)::jsonb->'ts' AS event_time
     FROM people_view;
 
 CREATE MATERIALIZED VIEW people_view_count AS
@@ -64,3 +65,5 @@ CREATE SINK people_join_sink
 FROM people_join
 INTO KAFKA BROKER 'kafka:9092' TOPIC 'JoinResult'
 FORMAT JSON;
+
+COPY (TAIL people_join) TO STDOUT
