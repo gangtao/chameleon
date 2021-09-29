@@ -6,10 +6,25 @@ services:
     ports:
       - '9092:9092'
       - '9644:9644'
+    deploy:
+      resources:
+        limits:
+          cpus: 2
+          memory: 4096M
+        reservations:
+          memory: 4096M
   chameleon:
     image: chameleon:0.1
     ports:
       - "3000:3000"
     volumes:
       - ./config/:/config/
+      - ./data/:/data/
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5
+          memory: 512M
+        reservations:
+          memory: 512M
 
