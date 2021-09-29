@@ -1,0 +1,57 @@
+{
+ "name": "people",
+ "sink": {
+  "name": "sinkname",
+  "type": "kafka",
+  "config": {
+   "brokers": [
+    "kafka:9092"
+   ],
+   "topic": "topic-A"
+  }
+ },
+ "source": {
+  "name": "sourcename",
+  "timestamp_field": "t",
+  "key_field" : "name",
+  "batch_size": 1,
+  "concurrency": 1,
+  "interval": [
+   1000
+  ],
+  "fields": [
+   {
+    "name": "t",
+    "type": "timestamp",
+    "timestamp_delay_min" : 0,
+    "timestamp_delay_max" : 0
+   },
+   {
+    "name": "name",
+    "type": "string",
+    "range": [
+     "Jon",
+     "Ava",
+     "Pino"
+    ]
+   },
+   {
+    "name": "country",
+    "type": "string",
+    "range": [
+     "USA",
+     "Canada",
+     "China"
+    ]
+   },
+   {
+    "name": "age",
+    "type": "int",
+    "limit": [
+     18,
+     50
+    ]
+   }
+  ]
+ }
+}

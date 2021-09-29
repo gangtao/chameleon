@@ -67,7 +67,8 @@ func (s *KafkaSink) Write(events *[]*source.Event) error {
 	err := s.Writer.WriteMessages(context.Background(), messages...)
 
 	if err != nil {
-		log.Println("failed to write messages")
+		log.Println("failed to write messages {}", err)
+
 	} else {
 		s.Counter += len(*events)
 	}

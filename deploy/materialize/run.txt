@@ -34,7 +34,7 @@ SELECT *, mz_logical_timestamp() FROM people_view_count;
 # sink
 CREATE SINK people_count_sink
 FROM people_view_count
-INTO KAFKA BROKER 'kafka:9092' TOPIC 'people-count'
+INTO KAFKA BROKER 'kafka:9092' TOPIC 'people_view_count'
 FORMAT JSON;
 
 # another table
